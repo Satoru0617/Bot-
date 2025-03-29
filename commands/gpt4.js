@@ -12,10 +12,18 @@ module.exports = {
     if (!prompt) return sendMessage(senderId, { text: "Usage: gpt4 <question>" }, pageAccessToken);
 
     try {
-      const { data: { result } } = await axios.get(`https://joshweb.click/api/gpt-4o?q=${encodeURIComponent(prompt)}&uid=${senderId}`);
-      sendMessage(senderId, { text: result }, pageAccessToken);
+      const { data: { response } } = await axios.get(`https://kaiz-apis.gleeze.com/api/gpt-4o?ask=${encodeURIComponent(prompt)}&uid=${senderId}&webSearch=off`);
+      const parts = [];
+
+      for (let i = 0; i < response.length; i += 1800) {
+        parts.push(response.substring(i, i + 1800));
+                                               }
+      // send all msg parts
+      for (const part of parts) {
+        await sendMessage(senderId, { text: part }, pageAccessToken);
+      }
     } catch {
-      sendMessage(senderId, { text: 'There was an error generating the content. Please try again later.' }, pageAccessToken);
+      sendMessage(senderId, { text: '🚨 Oups une erreur s\'est produite. Veuillez utiliser d\'autre moyen pour poser vos questions\n\n Exenmple \ngpt3 <question>\n ronald <question>\n ai <question>\n bert <question>' }, pageAccessToken);
     }
   }
 };
