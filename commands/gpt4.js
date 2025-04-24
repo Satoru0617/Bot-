@@ -3,27 +3,34 @@ const { sendMessage } = require('../handles/sendMessage');
 
 module.exports = {
   name: 'gpt4',
-  description: 'Interact with GPT-4o',
-  usage: 'gpt4 [your message]',
-  author: 'coffee',
+  description: 'Interagit avec Gpt4 ',
+  usage: 'gpt4 [votre message]',
+  author: 'RONALD SORY',
+  
 
   async execute(senderId, args, pageAccessToken) {
-    const prompt = args.join(' ');
-    if (!prompt) return sendMessage(senderId, { text: "Usage: gpt4 <question>" }, pageAccessToken);
+    const message = args.join(' ');
+    if (!message) {
+      return sendMessage(senderId, { text: "❗ Utilisation : groq [votre message]" }, pageAccessToken);
+    }
 
     try {
-      const { data: { response } } = await axios.get(`https://kaiz-apis.gleeze.com/api/gpt-4o?ask=${encodeURIComponent(prompt)}&uid=${senderId}&webSearch=off`);
-      const parts = [];
+      const apiUrl = `https://ronald-api-v1.vercel.app/api/gpt4?user_id=${senderId}&message=${encodeURIComponent(message)}`;
+      const response = await axios.get(apiUrl);
 
-      for (let i = 0; i < response.length; i += 1800) {
-        parts.push(response.substring(i, i + 1800));
-                                               }
-      // send all msg parts
-      for (const part of parts) {
-        await sendMessage(senderId, { text: part }, pageAccessToken);
+      const reply = response.data?.response?.trim() || response.data?.content?.trim();
+
+      if (reply) {
+        for (let i = 0; i < reply.length; i += 1800) {
+          await sendMessage(senderId, { text: reply.substring(i, i + 1800) }, pageAccessToken);
+        }
+      } else {
+        sendMessage(senderId, { text: "❌ Groq n'a pas pu répondre. Réessaie." }, pageAccessToken);
       }
-    } catch {
-      sendMessage(senderId, { text: '🚨 Oups une erreur s\'est produite. Veuillez utiliser d\'autre moyen pour poser vos questions\n\n Exenmple \ngpt3 <question>\n ronald <question>\n ai <question>\n bert <question>' }, pageAccessToken);
+
+    } catch (error) {
+      console.error("❌ Erreur API GPT-4 :", error.message);
+      sendMessage(senderId, { text: "🚨 Une erreur s'est produite. Réessaie plus tard." }, pageAccessToken);
     }
   }
 };
