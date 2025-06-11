@@ -3,15 +3,28 @@ const { sendMessage } = require('../handles/sendMessage');
 
 module.exports = {
   name: 'gpt4',
-  description: 'Interagit avec Gpt4 ',
+  description: 'Interagit avec Gpt4',
   usage: 'gpt4 [votre message]',
   author: 'RONALD SORY',
-  
 
   async execute(senderId, args, pageAccessToken) {
-    const message = args.join(' ');
+    const message = args.join(' ').toLowerCase();
     if (!message) {
-      return sendMessage(senderId, { text: "❗ Utilisation : groq [votre message]" }, pageAccessToken);
+      return sendMessage(senderId, { text: "❗ Utilisation : gpt4 [votre message]" }, pageAccessToken);
+    }
+
+    // Réponse personnalisée si on demande le créateur
+    const questionsCreateur = [
+      "qui t'a créé",
+      "qui est ton créateur",
+      "qui est ton createur",
+      "qui t’a créé",
+      "ton créateur",
+      "qui t a créé"
+    ];
+
+    if (questionsCreateur.some(q => message.includes(q))) {
+      return sendMessage(senderId, { text: "✨ C’est **Delfa Frost** qui m’a créé." }, pageAccessToken);
     }
 
     try {
@@ -25,7 +38,7 @@ module.exports = {
           await sendMessage(senderId, { text: reply.substring(i, i + 1800) }, pageAccessToken);
         }
       } else {
-        sendMessage(senderId, { text: "❌ Groq n'a pas pu répondre. Réessaie." }, pageAccessToken);
+        sendMessage(senderId, { text: "❌ GPT-4 n'a pas pu répondre. Réessaie." }, pageAccessToken);
       }
 
     } catch (error) {
