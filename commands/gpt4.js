@@ -24,7 +24,7 @@ module.exports = {
     ];
 
     if (questionsCreateur.some(q => message.includes(q))) {
-      return sendMessage(senderId, { text: "✨ C’est **Delfa Frost** qui m’a créé." }, pageAccessToken);
+      return sendMessage(senderId, { text: " Delfa Frost un jeune développeur talentueux." }, pageAccessToken);
     }
 
     try {
