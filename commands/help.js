@@ -11,6 +11,20 @@ module.exports = {
     const commandsDir = path.join(__dirname, '../commands');
     const commandFiles = fs.readdirSync(commandsDir).filter(file => file.endsWith('.js'));
 
+    // Define educational commands based on your specifications
+    const educationalCommands = ['ai', 'yoru', 'gmage', 'art', 'spotify', 'lyrics'];
+    const commandsList = [];
+
+    commandFiles.forEach(file => {
+      const command = require(path.join(commandsDir, file));
+      // Check if the command is in the educational commands list
+      if (educationalCommands.includes(command.name.toLowerCase())) {
+        commandsList.push(command);
+      } else {
+        commandsList.push(command);
+      }
+    });
+
     if (args.length > 0) {
       const commandName = args[0].toLowerCase();
       const commandFile = commandFiles.find(file => {
@@ -22,34 +36,43 @@ module.exports = {
         const command = require(path.join(commandsDir, commandFile));
         const commandDetails = `
 ━━━━━━━━━━━━━━
-𝙲𝚘𝚖𝚖𝚊𝚗𝚍 𝙽𝚊𝚖𝚎: ${command.name}
-𝙳𝚎𝚜𝚌𝚛𝚒𝚋𝚝𝚒𝚘𝚗: ${command.description}
-𝚄𝚜𝚊𝚐𝚎: ${command.usage}
+💡 **Command Name:** ${command.name}
+📝 **Description:** ${command.description}
+📖 **Usage:** ${command.usage}
+✨ **Example:** ${command.example ? command.example : "No example available."}
 ━━━━━━━━━━━━━━`;
         
         sendMessage(senderId, { text: commandDetails }, pageAccessToken);
       } else {
-        sendMessage(senderId, { text: `Command "${commandName}" not found.` }, pageAccessToken);
+        sendMessage(senderId, { text: `❌ Command "${commandName}" not found. Please check the command name and try again.` }, pageAccessToken);
       }
       return;
     }
 
-    const commands = commandFiles.map(file => {
-      const command = require(path.join(commandsDir, file));
-      return `│ - ${command.name}`;
-    });
+    // Prepare the help message for both categories
+    const educationalCommandsList = commandsList
+      .filter(command => educationalCommands.includes(command.name.toLowerCase()))
+      .map(command => `│ - ${command.name}`).join('\n');
+
+    const otherCommandsList = commandsList
+      .filter(command => !educationalCommands.includes(command.name.toLowerCase()))
+      .map(command => `│ - ${command.name}`).join('\n');
 
     const helpMessage = `
 ━━━━━━━━━━━━━━
-𝐥𝐞𝐬 𝐜𝐨𝐦𝐦𝐚𝐧𝐝𝐞𝐬 𝐯𝐚𝐥𝐢𝐝𝐞𝐬 :
-╭─╼~~(∩_∩)~~╾─╮
-${commands.join('\n')}
-╰─━━━🙃━━━━╾─╯
-𝐎𝐖𝐍𝐄𝐑: 𝐓𝐇𝐄𝐀 𝐒𝐭𝐚𝐫𝐥𝐢𝐧𝐞𝐬𝐬 (𝐀𝐞𝐬𝐭𝐡𝐞𝐫)👑
-𝐥𝐢𝐧𝐤: https://www.facebook.com/Thea.Starliness
-🩸𝐔𝐬𝐫𝐞𝐫 𝐝𝐞 𝐡𝐞𝐥𝐩 𝐩𝐨𝐮𝐫 𝐯𝐨𝐢𝐫 𝐥𝐚 𝐥𝐢𝐬𝐭𝐞 𝐝𝐞 𝐦𝐞𝐬 𝐜𝐨𝐦𝐦𝐚𝐧𝐝𝐞𝐬🩸.
+😁 Available Educational Commands:
+╭─╼━━━━━━━━╾─╮
+${educationalCommandsList || 'No educational commands available.'}
+╰─━━━━━━━━━╾─╯
+
+👉 Available Other Commands:
+╭─╼━━━━━━━━╾─╮
+${otherCommandsList || 'No other commands available.'}
+╰─━━━━━━━━━╾─╯
+📩 Type help [command name] to see command details.
 ━━━━━━━━━━━━━━`;
 
     sendMessage(senderId, { text: helpMessage }, pageAccessToken);
   }
 };
+  
